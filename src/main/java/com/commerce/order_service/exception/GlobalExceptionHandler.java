@@ -52,6 +52,20 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
 	}
 	
+	@ExceptionHandler(ProductLookupException.class)
+	public ResponseEntity<?> handlesFeignClientError(ProductLookupException ex){
+		
+		
+		ErrorResponse error = new ErrorResponse(
+				
+				ex.getMessage(),
+				HttpStatus.NOT_FOUND.value(),
+				LocalDateTime.now()
+				);
+		
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+		
+	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<Map<String, String>> handleValidationErrors(

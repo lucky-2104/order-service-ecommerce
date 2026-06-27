@@ -7,10 +7,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.commerce.order_service.config.FeignConfig;
 import com.commerce.order_service.response.ProductResponse;
 
 @Component
-@FeignClient(name="product-service")
+@FeignClient(name="product-service",configuration=FeignConfig.class)
 public interface ProductServiceClient {
 
 	@GetMapping("/api/v1/products/{id}")
