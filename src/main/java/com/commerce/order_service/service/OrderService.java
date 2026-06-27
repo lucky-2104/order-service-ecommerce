@@ -118,9 +118,14 @@ public class OrderService {
 		Order fetchedOrder = orderRepository.findById(id).orElseThrow(()-> new OrderNotFoundException("Order with particular ID not found"));
 		
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
+		boolean isAdmin = authentication
+				.getAuthorities()
+				.stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+		
 		String email = (String) authentication.getPrincipal();
 		
-		if(!email.equals(fetchedOrder.getUserEmail())) throw new OrderNotFoundException("Order with particular ID not found");
+		if(!isAdmin && !email.equals(fetchedOrder.getUserEmail())) throw new OrderNotFoundException("Order with particular ID not found");
 		
 		return mapOrderToOrderResponse(fetchedOrder);
 	}
