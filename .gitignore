@@ -33,3 +33,6 @@ build/
 .vscode/
 application-dev.yml
 **/application-dev.yml
+
+application-docker.yml
+**/application-docker.yml
