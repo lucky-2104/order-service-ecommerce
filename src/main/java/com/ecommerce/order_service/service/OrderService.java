@@ -1,10 +1,13 @@
 package com.ecommerce.order_service.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.ecommerce.order_service.dto.request.OrderConfirmedNotification;
+import com.ecommerce.order_service.messaging.NotificationEventPublisher;
 import com.ecommerce.order_service.event.OrderItemEvent;
 import com.ecommerce.order_service.event.OrderPlacedEvent;
 import com.ecommerce.order_service.event.OrderStatusEvent;
@@ -36,6 +39,7 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 	private final ProductServiceClient productServiceClient;
 	private final OrderEventPublisher orderEventPublisher;
+	private final NotificationEventPublisher notificationEventPublisher;
 	
 	private OrderItemResponse mapOrderItemToOrderItemResponse(OrderItem orderItem) {
 		
@@ -182,13 +186,27 @@ public class OrderService {
 
 		Order order = orderRepository.findById(event.orderId()).orElseThrow(() -> new OrderNotFoundException("Order with ID not found : "+event.orderId()));
 
-		if(event.reason().equals("ORDER_FAILED")){
+		if("ORDER_FAILED".equals(event.reason())){
 			order.setStatus(OrderStatus.CANCELLED);
-			return;
-		}
+			orderRepository.save(order);
+        }
 		else {
+			//Kafka Event
 			order.setStatus(OrderStatus.CONFIRMED);
-			return;
-		}
-	}
+			orderRepository.save(order);
+			//Notification for the RabbitMQ.
+			OrderConfirmedNotification orderNotification = new OrderConfirmedNotification(
+					order.getId(),
+					order.getUserEmail(),
+					order.getTotalAmount(),
+					LocalDateTime.now()
+			);
+
+
+
+			notificationEventPublisher.publishOrderConfirmed(orderNotification);
+
+        }
+
+    }
 }

@@ -60,7 +60,6 @@ public class Order {
 	@UpdateTimestamp
 	@Column(name="updated_at",nullable=false,updatable=true)
 	private LocalDateTime updatedAt;
-	
-	
-	
+
+
 }

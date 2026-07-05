@@ -16,6 +16,8 @@ public class OrderStatusEventConsumer {
             groupId="order-service-group"
             )
     public void consume(OrderStatusEvent event){
+
         orderService.updatedStatus(event);
+
     }
 }
