@@ -88,10 +88,6 @@ public class OrderService {
 
 
 	public OrderResponse createOrder(CreateOrderRequest request){
-		
-
-		
-		
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		
 		String email = (String) authentication.getPrincipal();
