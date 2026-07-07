@@ -1,5 +1,15 @@
 package com.ecommerce.order_service.entity;
 
 public enum Category {
-	ELECTRONICS
+
+	ELECTRONICS,
+	FASHION,
+	HOME_AND_KITCHEN,
+	BOOKS,
+	SPORTS_AND_OUTDOORS,
+	BEAUTY_AND_PERSONAL_CARE,
+	GROCERY,
+	TOYS_AND_GAMES,
+	AUTOMOTIVE,
+	HEALTH_AND_WELLNESS
 }
