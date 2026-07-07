@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.ecommerce.order_service.dto.response.ErrorResponse;
 
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -79,11 +80,12 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<?> handlesGenericException(Exception ex){
-		
-		
+
+
 		ErrorResponse error = new ErrorResponse(
-				
-				"Unexpected Error Occured",
+
+
+				"Unexpected Error Occurred" ,
 				HttpStatus.INTERNAL_SERVER_ERROR.value(),
 				LocalDateTime.now()
 				);
