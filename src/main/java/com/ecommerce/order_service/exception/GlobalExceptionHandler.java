@@ -77,7 +77,17 @@ public class GlobalExceptionHandler {
 	    );
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 	}
-	
+
+	@ExceptionHandler(ProductServiceUnavailableException.class)
+	public ResponseEntity<?> handleProductServiceUnavailableException(Exception ex)
+	{
+		ErrorResponse error = new ErrorResponse(
+				ex.getMessage(),
+				HttpStatus.SERVICE_UNAVAILABLE.value(),
+				LocalDateTime.now()
+		);
+		return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+	}
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<?> handlesGenericException(Exception ex){
 
@@ -85,7 +95,7 @@ public class GlobalExceptionHandler {
 		ErrorResponse error = new ErrorResponse(
 
 
-				"Unexpected Error Occurred" ,
+				"Unexpected Error Occurred : "+ex.getMessage() ,
 				HttpStatus.INTERNAL_SERVER_ERROR.value(),
 				LocalDateTime.now()
 				);

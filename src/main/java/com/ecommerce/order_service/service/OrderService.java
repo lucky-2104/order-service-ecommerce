@@ -7,11 +7,15 @@ import java.util.List;
 import java.util.UUID;
 
 import com.ecommerce.order_service.dto.request.OrderConfirmedNotification;
+import com.ecommerce.order_service.exception.ProductServiceUnavailableException;
 import com.ecommerce.order_service.messaging.NotificationEventPublisher;
 import com.ecommerce.order_service.event.OrderItemEvent;
 import com.ecommerce.order_service.event.OrderPlacedEvent;
 import com.ecommerce.order_service.event.OrderStatusEvent;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,14 +36,15 @@ import com.ecommerce.order_service.dto.response.ProductResponse;
 
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
 	private final OrderRepository orderRepository;
-	private final ProductServiceClient productServiceClient;
 	private final OrderEventPublisher orderEventPublisher;
 	private final NotificationEventPublisher notificationEventPublisher;
+	private final ProductLookupService productLookupService;
 	
 	private OrderItemResponse mapOrderItemToOrderItemResponse(OrderItem orderItem) {
 		
@@ -85,8 +90,6 @@ public class OrderService {
 				.build();
 	}
 
-
-
 	public OrderResponse createOrder(CreateOrderRequest request){
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		
@@ -106,7 +109,7 @@ public class OrderService {
 		
 		for(OrderItemRequest order : orderList) {
 			
-			ProductResponse product = productServiceClient.getProductByID(order.productId());
+			ProductResponse product = productLookupService.getProductDetails(order.productId());
 			
 			Integer productStockQuantity = product.stockQuantity();
 			Integer quantityRequested = order.quantity();
