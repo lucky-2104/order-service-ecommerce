@@ -31,10 +31,12 @@ public class SecurityConfig {
 		.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		.authorizeHttpRequests(
 				auth -> auth
+
 				.requestMatchers(HttpMethod.POST, "/api/v1/orders/**").hasAnyRole("ADMIN","CUSTOMER")
 				.requestMatchers(HttpMethod.GET,"/api/v1/orders/myorders").hasAnyRole("CUSTOMER","ADMIN")
 				.requestMatchers(HttpMethod.GET,"/api/v1/orders/*").hasAnyRole("CUSTOMER","ADMIN")
 				.requestMatchers(HttpMethod.GET,"/api/v1/orders/**").hasRole("ADMIN")
+						.requestMatchers("/actuator/**").permitAll()
 				.anyRequest().authenticated()
 				)
 		.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
